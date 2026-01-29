@@ -199,7 +199,10 @@ on:
 docker build -t generate-jsonschema-action .
 ```
 
+
 ### Testing Locally
+
+#### On Unix/macOS (bash):
 
 ```bash
 docker run --rm \
@@ -207,6 +210,24 @@ docker run --rm \
   -v $(pwd)/test:/test \
   generate-jsonschema-action
 ```
+
+#### On Windows (PowerShell):
+
+Use backticks (`) for line continuation, and use `${PWD}` for the current directory. Use absolute Windows paths with forward slashes or double backslashes.
+
+```powershell
+docker run --rm `
+  -e DATA_MODEL_SOURCE="/test/data.model.csv" `
+  -v "${PWD}/test:/test" `
+  generate-jsonschema-action
+```
+
+Or as a single line:
+
+```powershell
+docker run --rm -e DATA_MODEL_SOURCE="/test/data.model.csv" -v "${PWD}/test:/test" generate-jsonschema-action
+```
+
 
 ## Technical Details
 
