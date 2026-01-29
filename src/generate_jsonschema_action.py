@@ -11,17 +11,6 @@ from synapseclient.extensions.curator import generate_jsonschema
 
 def main():
     """Main function to generate JSON schemas from data models."""
-
-    # Debug info to understand container file system
-    print(f"::group::Debug Info")
-    print(f"Current Working Directory: {os.getcwd()}")
-    print(f"User ID: {os.getuid()}")
-    print("Listing directory contents:")
-    for root, dirs, files in os.walk("."):
-        for name in files:
-            print(os.path.join(root, name))
-    print(f"::endgroup::")
-
     data_model_source = os.environ.get('DATA_MODEL_SOURCE')
     if not data_model_source:
         print("::error::DATA_MODEL_SOURCE is required", file=sys.stderr)
@@ -37,30 +26,8 @@ def main():
             )
             return 1
 
-        # Verify file can be read and show basic info
-        print(f"::group::Data Model File Verification")
-        print(f"✓ File found: {data_model_source}")
-        print(f"  Absolute path: {data_model_path.absolute()}")
-        print(f"  File size: {data_model_path.stat().st_size} bytes")
-        print(f"  File is readable: {data_model_path.is_file()}")
-
-        # Show first few lines of the CSV
-        try:
-            with open(data_model_path, 'r', encoding='utf-8') as f:
-                lines = [f.readline() for _ in range(5)]
-                print(f"  First 5 lines of CSV:")
-                for i, line in enumerate(lines, 1):
-                    display_line = line.strip()[:150]
-                    if len(line.strip()) > 150:
-                        display_line += "..."
-                    print(f"    Line {i}: {display_line}")
-        except Exception as e:
-            print(f"  Warning: Could not read file preview: {e}")
-
-        print(f"::endgroup::")
-
     # Parse data_types: empty string means all types (None)
-    data_types_str = os.environ.get('DATA_TYPES', '')
+    data_types_str = os.environ.get('DATA_TYPES', None)
     data_types = (
         [dt.strip() for dt in data_types_str.split(',') if dt.strip()]
         if data_types_str
@@ -83,20 +50,9 @@ def main():
 
     try:
         # 2. Authenticate to Synapse is not needed for the generate_jsonschema functionality
-        syn = Synapse(debug=True)
+        syn = Synapse()
 
         # 3. Generate schemas
-        print(f"::group::Schema Generation Parameters")
-        print(f"Generating schemas from {data_model_source}...")
-        if data_types:
-            print(f"  Data types: {', '.join(data_types)}")
-        else:
-            print("  Data types: All types in model")
-        print(f"  Labels: {data_model_labels}")
-        print(f"  Output directory: {output_dir}")
-        print(f"::endgroup::")
-
-        print("Calling generate_jsonschema function...")
         schemas, file_paths = generate_jsonschema(
             data_model_source=data_model_source,
             synapse_client=syn,
@@ -104,17 +60,6 @@ def main():
             output=output_dir,
             data_model_labels=data_model_labels
         )
-
-        print(f"::group::Schema Generation Results")
-        print(f"Schemas returned: {len(schemas)}")
-        print(f"File paths returned: {len(file_paths)}")
-        if file_paths:
-            print("Generated files:")
-            for fp in file_paths:
-                print(f"  - {fp}")
-        else:
-            print("No files were generated")
-        print(f"::endgroup::")
 
         # 4. Write outputs to GITHUB_OUTPUT
         github_output = os.environ.get('GITHUB_OUTPUT')
