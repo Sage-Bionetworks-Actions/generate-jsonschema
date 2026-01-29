@@ -1,214 +1,263 @@
-# Create a Container Action
+# Generate JSON Schema Action
 
-![Continuous Integration](https://github.com/actions/container-action/actions/workflows/ci.yml/badge.svg)
-![Linter](https://github.com/actions/container-action/actions/workflows/linter.yml/badge.svg)
+![Continuous Integration](https://github.com/sage-bionetworks/generate-jsonschema/actions/workflows/ci.yml/badge.svg)
+![Linter](https://github.com/sage-bionetworks/generate-jsonschema/actions/workflows/linter.yml/badge.svg)
 
-Use this template to bootstrap the creation of a container action. :rocket:
+A GitHub Action to generate JSON Schema files from data models (CSV/JSONLD) using the Synapse Python Client curator extension.
 
-This template includes compilation support, tests, a validation workflow,
-publishing, and versioning guidance.
+This action is part of the DPE-1554 implementation for automated JSON Schema management in Synapse workflows.
 
-## Create Your Own Action
+## Features
 
-To create your own action, you can use this repository as a template! Just
-follow the below instructions:
-
-1. Click the **Use this template** button at the top of the repository
-1. Select **Create a new repository**
-1. Select an owner and name for your new repository
-1. Click **Create repository**
-1. Clone your new repository
-
-> [!IMPORTANT]
->
-> Make sure to remove or update the [`CODEOWNERS`](./CODEOWNERS) file! For
-> details on how to use this file, see
-> [About code owners](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners).
-
-## Initial Setup
-
-After you've cloned the repository to your local machine or codespace, you'll
-need to perform some initial setup steps before you can develop your action.
-
-> [!NOTE]
->
-> You'll need to have a reasonably modern version of
-> [Docker](https://www.docker.com/get-started/) handy (e.g. docker engine
-> version 20 or later).
-
-1. :hammer_and_wrench: Build the container
-
-   Make sure to replace `actions/container-action` with an appropriate label for
-   your container.
-
-   ```bash
-   docker build -t actions/container-action .
-   ```
-
-1. :white_check_mark: Test the container
-
-   You can pass individual environment variables using the `--env` or `-e` flag.
-
-   ```bash
-   $ docker run --env INPUT_WHO_TO_GREET="Mona Lisa Octocat" actions/container-action
-   ::notice file=entrypoint.sh,line=7::Hello, Mona Lisa Octocat!
-   ```
-
-   Or you can pass a file with environment variables using `--env-file`.
-
-   ```bash
-   $ cat ./.env.test
-   INPUT_WHO_TO_GREET="Mona Lisa Octocat"
-
-   $ docker run --env-file ./.env.test actions/container-action
-   ::notice file=entrypoint.sh,line=7::Hello, Mona Lisa Octocat!
-   ```
-
-## Update the Action Metadata
-
-The [`action.yml`](action.yml) file defines metadata about your action, such as
-input(s) and output(s). For details about this file, see
-[Metadata syntax for GitHub Actions](https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions).
-
-When you copy this repository, update `action.yml` with the name, description,
-inputs, and outputs for your action.
-
-## Update the Action Code
-
-In this template, the container action runs a shell script,
-[`entrypoint.sh`](./entrypoint.sh), when the container is launched. Since you
-can choose any base Docker image and language you like, you can change this to
-suite your needs. There are a few main things to remember when writing code for
-container actions:
-
-- Inputs are accessed using argument identifiers or environment variables
-  (depending on what you set in your `action.yml`). For example, the first input
-  to this action, `who-to-greet`, can be accessed in the entrypoint script using
-  the `$INPUT_WHO_TO_GREET` environment variable.
-
-  ```bash
-  GREETING="Hello, $INPUT_WHO_TO_GREET!"
-  ```
-
-- GitHub Actions supports a number of different workflow commands such as
-  creating outputs, setting environment variables, and more. These are
-  accomplished by writing to different `GITHUB_*` environment variables. For
-  more information, see
-  [Workflow commands](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions).
-
-  | Scenario              | Example                                         |
-  | --------------------- | ----------------------------------------------- |
-  | Set environment vars  | `echo "MY_VAR=my-value" >> "$GITHUB_ENV"`       |
-  | Set outputs           | `echo "greeting=$GREETING" >> "$GITHUB_OUTPUT"` |
-  | Prepend to `PATH`     | `echo "$HOME/.local/bin" >> "$GITHUB_PATH"`     |
-  | Set `pre`/`post` vars | `echo "MY_VAR=my-value" >> "$GITHUB_STATE"`     |
-  | Set step summary      | `echo "{markdown}" >> "$GITHUB_STEP_SUMMARY"`   |
-
-  You can write multiline strings using the following syntax:
-
-  ```bash
-  {
-    echo "JSON_RESPONSE<<EOF"
-    curl https://example.com
-    echo "EOF"
-  } >> "$GITHUB_ENV"
-  ```
-
-- Make sure that the script being run is executable!
-
-  ```bash
-  git add entrypoint.sh
-  git update-index --chmod=+x entrypoint.sh
-  ```
-
-So, what are you waiting for? Go ahead and start customizing your action!
-
-1. Create a new branch
-
-   ```bash
-   git checkout -b releases/v1
-   ```
-
-1. Replace the contents of `entrypoint.sh` with your action code
-1. Build and test the container
-
-   ```bash
-   docker build -t actions/container-action .
-   docker run actions/container-action "Mona Lisa Octocat"
-   ```
-
-1. Commit your changes
-
-   ```bash
-   git add .
-   git commit -m "My first action is ready!"
-   ```
-
-1. Push them to your repository
-
-   ```bash
-   git push -u origin releases/v1
-   ```
-
-1. Create a pull request and get feedback on your action
-1. Merge the pull request into the `main` branch
-
-Your action is now published! :rocket:
-
-For information about versioning your action, see
-[Versioning](https://github.com/actions/toolkit/blob/main/docs/action-versioning.md)
-in the GitHub Actions toolkit.
-
-## Validate the Action
-
-You can now validate the action by referencing it in a workflow file. For
-example, [`ci.yml`](./.github/workflows/ci.yml) demonstrates how to reference an
-action in the same repository.
-
-```yaml
-steps:
-  - name: Checkout
-    id: checkout
-    uses: actions/checkout@v4
-
-  - name: Test Local Action
-    id: test-action
-    uses: ./
-    with:
-      who-to-greet: Mona Lisa Octocat
-
-  - name: Print Output
-    id: output
-    run: echo "${{ steps.test-action.outputs.greeting }}"
-```
-
-For example workflow runs, check out the
-[Actions tab](https://github.com/actions/container-action/actions)! :rocket:
+- ✅ Generate JSON Schemas from CSV or JSONLD data models
+- ✅ Filter schemas by specific data types
+- ✅ Support for class_label and display_label modes
+- ✅ Output schemas as both files and JSON for downstream processing
+- ✅ Designed for CI/CD workflows and Pull Request validation
+- ✅ Uses official Synapse Python Client Docker image
 
 ## Usage
 
-After testing, you can create version tag(s) that developers can use to
-reference different stable versions of your action. For more information, see
-[Versioning](https://github.com/actions/toolkit/blob/main/docs/action-versioning.md)
-in the GitHub Actions toolkit.
-
-To include the action in a workflow in another repository, you can use the
-`uses` syntax with the `@` symbol to reference a specific branch, tag, or commit
-hash.
+### Basic Example
 
 ```yaml
-steps:
-  - name: Checkout
-    id: checkout
-    uses: actions/checkout@v4
+name: Validate Data Model
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - labeled
+    branches:
+      - 'main'
+    paths:
+      - 'models/**'  # Only trigger when model files change
 
-  - name: Test Local Action
-    id: test-action
-    uses: actions/container-action@v1 # Commit with the `v1` tag
-    with:
-      who-to-greet: Mona Lisa Octocat
+jobs:
+  generate-schemas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-  - name: Print Output
-    id: output
-    run: echo "${{ steps.test-action.outputs.greeting }}"
+      - name: Generate JSON Schemas
+        id: generate
+        uses: sage-bionetworks/generate-jsonschema@v1
+        with:
+          data-model-source: ./models/data.model.csv
+          # data-types omitted = generate all types
+
+      - name: Upload schemas as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: json-schemas
+          path: ${{ steps.generate.outputs.schemas }}
 ```
+
+### Generate Specific Schemas with Custom Labels
+
+```yaml
+- name: Generate Schemas for Specific Types
+  id: generate
+  uses: sage-bionetworks/generate-jsonschema@v1
+  with:
+    data-model-source: ./models/biospecimen.model.csv
+    data-types: 'Patient,Biospecimen,Analysis'
+    data-model-labels: 'display_label'
+```
+
+### With PR Comment Integration
+
+This action can be combined with [mshick/add-pr-comment](https://github.com/mshick/add-pr-comment) to automatically post schema summaries to Pull Requests:
+
+```yaml
+name: Generate and Comment Schemas
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - labeled
+    branches:
+      - 'main'
+    paths:
+      - 'models/**'
+
+jobs:
+  generate-schemas:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate JSON Schemas
+        id: generate
+        uses: sage-bionetworks/generate-jsonschema@v1
+        with:
+          data-model-source: ./models/data.model.csv
+
+      - name: Format Schema Report
+        id: format
+        run: |
+          python - <<'PYTHON'
+          import json
+          import sys
+
+          schemas = json.loads('''${{ steps.generate.outputs.schemas-json }}''')
+
+          # Build markdown report with collapsible sections
+          report = "## Generated JSON Schemas\n\n"
+
+          for schema in schemas:
+              schema_name = schema.get('title', 'Unnamed Schema')
+              schema_id = schema.get('$id', 'N/A')
+
+              report += f"<details>\n<summary><strong>{schema_name}</strong></summary>\n\n"
+              report += f"**Schema ID:** `{schema_id}`\n\n"
+
+              # Add properties summary
+              properties = schema.get('properties', {})
+              if properties:
+                  report += "**Properties:**\n"
+                  for prop_name, prop_def in properties.items():
+                      prop_type = prop_def.get('type', 'any')
+                      required = '✓' if prop_name in schema.get('required', []) else ''
+                      report += f"- `{prop_name}` ({prop_type}) {required}\n"
+
+              report += "\n</details>\n\n"
+
+          # Write to file
+          with open('schema-report.md', 'w') as f:
+              f.write(report)
+          PYTHON
+
+      - name: Comment PR with Schema Summary
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-path: schema-report.md
+          message-id: schema-generation
+```
+
+The `schemas-json` output contains the full array of schema dictionaries, allowing you to create custom formatters and reports. The `message-id` parameter ensures the comment is "sticky" and will update on subsequent runs rather than creating multiple comments.
+
+## Inputs
+
+| Input | Description | Required | Default |
+|-------|-------------|----------|---------|
+| `data-model-source` | Path or URL to CSV or JSONLD data model file | Yes | - |
+| `data-types` | Comma-separated list of data types to generate schemas for (leave empty for all) | No | `''` |
+| `data-model-labels` | Label type to use: `class_label` or `display_label` | No | `class_label` |
+
+### About `data-model-labels`
+
+- `class_label` (default): Uses standard attribute names as property keys
+- `display_label`: Uses display names if valid (no blacklisted characters like parentheses, periods, spaces, or hyphens)
+
+## Outputs
+
+| Output | Description |
+|--------|-------------|
+| `schemas` | Path to directory containing generated schema files (e.g., `/workspace/schemas`) |
+| `schemas-json` | JSON string containing array of generated schema dictionaries for use with PR comment actions or other downstream processing |
+
+## Workflow Trigger Configuration (Recommended)
+
+We recommend using specific workflow triggers to run this action only when relevant files change. This improves efficiency and reduces unnecessary CI runs.
+
+### Recommended Trigger Configuration
+
+```yaml
+on:
+  pull_request:
+    types:
+      - opened           # When PR is first opened
+      - synchronize      # When new commits are pushed
+      - labeled          # When labels are added (optional - useful for manual triggers)
+    branches:
+      - 'main'           # Only for PRs targeting main branch
+    paths:
+      - 'path/to/data/model/directories/**'      # Your data model directories
+```
+
+### Why These Triggers?
+
+- **`types`**: Controls when the workflow runs during the PR lifecycle
+  - `opened`: Validates schemas when PR is created
+  - `synchronize`: Re-validates on new commits
+  - `labeled`: Allows manual triggering by adding labels
+
+- **`branches`**: Ensures the workflow only runs for PRs targeting your main branch
+
+- **`paths`**: Prevents unnecessary runs when unrelated files change (e.g., documentation, tests)
+
+
+## Local Development and Testing
+
+### Building the Docker Container
+
+```bash
+docker build -t generate-jsonschema-action .
+```
+
+
+### Testing Locally
+
+#### On Unix/macOS (bash):
+
+```bash
+docker run --rm \
+  -e DATA_MODEL_SOURCE="/test/data.model.csv" \
+  -v $(pwd)/test:/test \
+  generate-jsonschema-action
+```
+
+#### On Windows (PowerShell):
+
+Use backticks (`) for line continuation, and use `${PWD}` for the current directory. Use absolute Windows paths with forward slashes or double backslashes.
+
+```powershell
+docker run --rm `
+  -e DATA_MODEL_SOURCE="/test/data.model.csv" `
+  -v "${PWD}/test:/test" `
+  generate-jsonschema-action
+```
+
+Or as a single line:
+
+```powershell
+docker run --rm -e DATA_MODEL_SOURCE="/test/data.model.csv" -v "${PWD}/test:/test" generate-jsonschema-action
+```
+
+
+## Technical Details
+
+- **Base Image**: `ghcr.io/sage-bionetworks/synapsepythonclient:v4.11.0`
+- **Python Version**: 3.10+
+- **Dependencies**: synapseclient v4.11.0 with curator extension (pre-installed in base image)
+
+## Related Actions
+
+This action is designed to work with:
+- [sage-bionetworks/register-jsonschema](https://github.com/sage-bionetworks/register-jsonschema) - Register generated schemas to Synapse organizations (coming soon)
+- [mshick/add-pr-comment](https://github.com/mshick/add-pr-comment) - Post schema summaries to Pull Requests
+
+## Documentation
+
+- [Synapse Schema Operations Tutorial](https://python-docs.synapse.org/en/latest/tutorials/python/schema_operations/)
+- [Synapse Curator Extension API Reference](https://python-docs.synapse.org/en/stable/reference/experimental/extensions/curator/)
+- [Synapse Curator Extension Guide](https://python-docs.synapse.org/en/stable/guides/curator/)
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+See [LICENSE](LICENSE) file for details.
+
+## Support
+
+For issues and questions:
+- Open an issue in this repository
+- Check the [Synapse documentation](https://python-docs.synapse.org/)
+- Visit the [Sage Bionetworks community forums](https://www.synapse.org/)

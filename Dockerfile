@@ -1,11 +1,15 @@
-# Set the base image to use for subsequent instructions
-FROM alpine:3.23
+FROM ghcr.io/sage-bionetworks/synapsepythonclient:v4.11.0
 
-# Set the working directory inside the container
+# Copy requirements and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir synapseclient[pandas,curator]
+
+# Set working directory
 WORKDIR /usr/src
 
-# Copy any source file(s) required for the action
-COPY entrypoint.sh .
+# Copy Python script
+COPY src/generate_jsonschema_action.py .
 
-# Configure the container to be run as an executable
-ENTRYPOINT ["/usr/src/entrypoint.sh"]
+# Set entrypoint to Python script
+ENTRYPOINT ["python", "/usr/src/generate_jsonschema_action.py"]
