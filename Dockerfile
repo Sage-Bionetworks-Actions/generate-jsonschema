@@ -5,11 +5,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir synapseclient[pandas,curator]
 
-# Set working directory
-WORKDIR /usr/src
-
 # Copy Python script
-COPY src/generate_jsonschema_action.py .
+COPY src/generate_jsonschema_action.py /usr/local/bin/generate_jsonschema_action.py
+
+# Set working directory to GitHub workspace
+WORKDIR /github/workspace
 
 # Set entrypoint to Python script
-ENTRYPOINT ["python", "/usr/src/generate_jsonschema_action.py"]
+ENTRYPOINT ["python", "/usr/local/bin/generate_jsonschema_action.py"]
