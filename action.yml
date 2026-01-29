@@ -1,26 +1,38 @@
-name: The name of your action here
-description: Provide a description here
-author: Your name or organization here
+name: Generate JSON Schema
+description: Parse Data Models (CSV/JSONLD) and generate JSON Schema files for Synapse
+author: Sage Bionetworks
 
-# Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: heart
-  color: red
+  icon: file-text
+  color: blue
 
-# Define your inputs here.
 inputs:
-  who-to-greet:
-    description: Your input description here
+  synapse-auth-token:
+    description: 'Synapse Personal Access Token for authentication'
     required: true
-    default: World
+  data-model-source:
+    description: 'Path to CSV or JSONLD data model file'
+    required: true
+  data-types:
+    description: 'Comma-separated list of data types to generate schemas for (leave empty for all)'
+    required: false
+    default: ''
+  data-model-labels:
+    description: 'Label type to use: class_label or display_label'
+    required: false
+    default: 'class_label'
 
-# Define your outputs here.
 outputs:
-  greeting:
-    description: Your output description here
+  schemas:
+    description: 'Path to directory containing generated schema files'
+  schemas-json:
+    description: 'JSON string containing array of generated schema dictionaries for use with PR comment actions'
 
 runs:
   using: docker
   image: Dockerfile
   env:
-    INPUT_WHO_TO_GREET: ${{ inputs.who-to-greet }}
+    SYNAPSE_AUTH_TOKEN: ${{ inputs.synapse-auth-token }}
+    DATA_MODEL_SOURCE: ${{ inputs.data-model-source }}
+    DATA_TYPES: ${{ inputs.data-types }}
+    DATA_MODEL_LABELS: ${{ inputs.data-model-labels }}
