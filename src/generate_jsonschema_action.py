@@ -12,6 +12,16 @@ from synapseclient.extensions.curator import generate_jsonschema
 def main():
     """Main function to generate JSON schemas from data models."""
 
+    # Debug info to understand container file system
+    print(f"::group::Debug Info")
+    print(f"Current Working Directory: {os.getcwd()}")
+    print(f"User ID: {os.getuid()}")
+    print("Listing directory contents:")
+    for root, dirs, files in os.walk("."):
+        for name in files:
+            print(os.path.join(root, name))
+    print(f"::endgroup::")
+
     data_model_source = os.environ.get('DATA_MODEL_SOURCE')
     if not data_model_source:
         print("::error::DATA_MODEL_SOURCE is required", file=sys.stderr)
@@ -43,8 +53,9 @@ def main():
         )
         data_model_labels = 'class_label'
 
-    # Create output directory
-    output_dir = '/workspace/schemas'
+    # Create output directory relative to current working directory
+    # This ensures it's created in the GitHub workspace where artifacts can be uploaded
+    output_dir = os.path.join(os.getcwd(), 'schemas')
     os.makedirs(output_dir, exist_ok=True)
 
     try:
