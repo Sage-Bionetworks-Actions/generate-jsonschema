@@ -43,7 +43,6 @@ jobs:
         id: generate
         uses: sage-bionetworks/generate-jsonschema@v1
         with:
-          synapse-auth-token: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
           data-model-source: ./models/data.model.csv
           # data-types omitted = generate all types
 
@@ -61,7 +60,6 @@ jobs:
   id: generate
   uses: sage-bionetworks/generate-jsonschema@v1
   with:
-    synapse-auth-token: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
     data-model-source: ./models/biospecimen.model.csv
     data-types: 'Patient,Biospecimen,Analysis'
     data-model-labels: 'display_label'
@@ -96,7 +94,6 @@ jobs:
         id: generate
         uses: sage-bionetworks/generate-jsonschema@v1
         with:
-          synapse-auth-token: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
           data-model-source: ./models/data.model.csv
 
       - name: Format Schema Report
@@ -147,7 +144,6 @@ The `schemas-json` output contains the full array of schema dictionaries, allowi
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
-| `synapse-auth-token` | Synapse Personal Access Token for authentication | Yes | - |
 | `data-model-source` | Path or URL to CSV or JSONLD data model file | Yes | - |
 | `data-types` | Comma-separated list of data types to generate schemas for (leave empty for all) | No | `''` |
 | `data-model-labels` | Label type to use: `class_label` or `display_label` | No | `class_label` |
@@ -180,9 +176,7 @@ on:
     branches:
       - 'main'           # Only for PRs targeting main branch
     paths:
-      - 'models/**'      # Your data model directory
-      - '**.csv'         # Any CSV files
-      - '**.jsonld'      # Any JSONLD files
+      - 'path/to/data/model/directories/**'      # Your data model directories
 ```
 
 ### Why These Triggers?
@@ -196,49 +190,6 @@ on:
 
 - **`paths`**: Prevents unnecessary runs when unrelated files change (e.g., documentation, tests)
 
-### Alternative Configurations
-
-**Run on all file changes (simpler but less efficient):**
-```yaml
-on:
-  pull_request:
-    branches:
-      - main
-```
-
-**Run only on specific data model files:**
-```yaml
-on:
-  pull_request:
-    types: [opened, synchronize]
-    branches: [main]
-    paths:
-      - 'models/data.model.csv'
-      - 'schemas/*.jsonld'
-```
-
-**Include push events for immediate feedback:**
-```yaml
-on:
-  pull_request:
-    types: [opened, synchronize]
-    branches: [main]
-    paths: ['models/**']
-  push:
-    branches: [main]
-    paths: ['models/**']
-```
-
-## Authentication
-
-The `synapse-auth-token` should be stored as a GitHub Secret:
-
-1. Go to your repository Settings → Secrets and variables → Actions
-2. Click "New repository secret"
-3. Name: `SYNAPSE_AUTH_TOKEN`
-4. Value: Your Synapse Personal Access Token
-
-The token needs minimal permissions - just read access to data models. For CI testing, consider using a dedicated service account with limited scope.
 
 ## Local Development and Testing
 
@@ -252,7 +203,6 @@ docker build -t generate-jsonschema-action .
 
 ```bash
 docker run --rm \
-  -e SYNAPSE_AUTH_TOKEN="your-token-here" \
   -e DATA_MODEL_SOURCE="/test/data.model.csv" \
   -v $(pwd)/test:/test \
   generate-jsonschema-action

@@ -37,7 +37,7 @@ def test_required_inputs_defined():
     with open(action_file) as f:
         action_config = yaml.safe_load(f)
 
-    required_inputs = ['synapse-auth-token', 'data-model-source']
+    required_inputs = ['data-model-source']
     for input_name in required_inputs:
         assert input_name in action_config['inputs'], \
             f"Required input '{input_name}' should be defined"
@@ -89,7 +89,6 @@ def test_docker_configuration():
 
     # Verify environment variables are mapped
     env = action_config['runs'].get('env', {})
-    assert 'SYNAPSE_AUTH_TOKEN' in env, "SYNAPSE_AUTH_TOKEN should be mapped"
     assert 'DATA_MODEL_SOURCE' in env, "DATA_MODEL_SOURCE should be mapped"
     assert 'DATA_TYPES' in env, "DATA_TYPES should be mapped"
     assert 'DATA_MODEL_LABELS' in env, "DATA_MODEL_LABELS should be mapped"
@@ -159,8 +158,6 @@ def test_readme_exists():
     content = readme.read_text()
     assert '# Generate JSON Schema Action' in content, \
         "README should have title"
-    assert 'synapse-auth-token' in content, \
-        "README should document synapse-auth-token input"
     assert 'data-model-source' in content, \
         "README should document data-model-source input"
     assert 'schemas' in content, "README should document schemas output"

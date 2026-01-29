@@ -7,9 +7,6 @@ branding:
   color: blue
 
 inputs:
-  synapse-auth-token:
-    description: 'Synapse Personal Access Token for authentication'
-    required: true
   data-model-source:
     description: 'Path to CSV or JSONLD data model file'
     required: true
@@ -32,7 +29,6 @@ runs:
   using: docker
   image: Dockerfile
   env:
-    SYNAPSE_AUTH_TOKEN: ${{ inputs.synapse-auth-token }}
     DATA_MODEL_SOURCE: ${{ inputs.data-model-source }}
     DATA_TYPES: ${{ inputs.data-types }}
     DATA_MODEL_LABELS: ${{ inputs.data-model-labels }}

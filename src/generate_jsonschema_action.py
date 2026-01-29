@@ -11,11 +11,6 @@ from synapseclient.extensions.curator import generate_jsonschema
 
 def main():
     """Main function to generate JSON schemas from data models."""
-    # 1. Validate and parse environment variables
-    auth_token = os.environ.get('SYNAPSE_AUTH_TOKEN')
-    if not auth_token:
-        print("::error::SYNAPSE_AUTH_TOKEN is required", file=sys.stderr)
-        return 1
 
     data_model_source = os.environ.get('DATA_MODEL_SOURCE')
     if not data_model_source:
@@ -53,11 +48,8 @@ def main():
     os.makedirs(output_dir, exist_ok=True)
 
     try:
-        # 2. Authenticate to Synapse
-        print("Authenticating to Synapse...")
+        # 2. Authenticate to Synapse is not needed for the generate_jsonschema functionality
         syn = Synapse()
-        syn.login(authToken=auth_token)
-        print("::notice::Successfully authenticated to Synapse")
 
         # 3. Generate schemas
         print(f"Generating schemas from {data_model_source}...")
