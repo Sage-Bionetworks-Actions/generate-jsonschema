@@ -10,7 +10,15 @@ from synapseclient.extensions.curator import generate_jsonschema
 
 
 def main():
-    """Main function to generate JSON schemas from data models."""
+    """
+    Main function to generate JSON schemas from data models.
+
+    Expects the following environment variables:
+    - DATA_MODEL_SOURCE: URL or local path to the data model file (required)
+    - DATA_TYPES: Comma-separated list of data types to include (optional, defaults to all)
+    - DATA_MODEL_LABELS: 'class_label' or 'display_label' for schema
+    - GITHUB_OUTPUT: Path to GitHub Actions output file (automatically provided in GitHub Actions environment)
+    """
     data_model_source = os.environ.get('DATA_MODEL_SOURCE')
     if not data_model_source:
         print("::error::DATA_MODEL_SOURCE is required", file=sys.stderr)
@@ -49,10 +57,7 @@ def main():
     os.makedirs(output_dir, exist_ok=True)
 
     try:
-        # 2. Authenticate to Synapse is not needed for the generate_jsonschema functionality
         syn = Synapse()
-
-        # 3. Generate schemas
         schemas, file_paths = generate_jsonschema(
             data_model_source=data_model_source,
             synapse_client=syn,
@@ -61,7 +66,7 @@ def main():
             data_model_labels=data_model_labels
         )
 
-        # 4. Write outputs to GITHUB_OUTPUT
+        # Write outputs to GITHUB_OUTPUT
         github_output = os.environ.get('GITHUB_OUTPUT')
         if github_output:
             with open(github_output, 'a') as f:
@@ -73,7 +78,7 @@ def main():
                 f.write(schemas_json)
                 f.write('\nEOF\n')
 
-        # 5. Print success summary
+        # Print success summary
         print(f"::notice::Successfully generated {len(file_paths)} schema(s)")
         for path in file_paths:
             # Get just the filename for cleaner output
