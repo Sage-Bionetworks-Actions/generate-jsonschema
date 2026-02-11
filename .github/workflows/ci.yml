@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  unit-tests:
+  test:
     name: Tests
     runs-on: ubuntu-latest
 
@@ -30,10 +30,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install git+https://github.com/Sage-Bionetworks/synapsePythonClient@fcf371f9bdeeaa8cf4ec0ea7c2446b7d20f35577
+          pip install git+https://github.com/Sage-Bionetworks/synapsePythonClient@fcf371f9bdeeaa8cf4ec0ea7c2446b7d20f35577[curator]
           pip install pytest
 
-      - name: Run Unit Tests
+      - name: Run Tests
         run: |
           python -m pytest test -v
 
