@@ -1,6 +1,13 @@
-import pytest
-from generate_jsonschema_action import main
+import sys
 from pathlib import Path
+import pytest
+
+# Add src to path for importing the action script
+sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+from generate_jsonschema_action import main
+
+DATA_MODEL_FILE = "data_model.csv"
+DATA_MODEL_PATH = Path(__file__).parent / DATA_MODEL_FILE
 
 
 @pytest.fixture(autouse=True)
@@ -24,7 +31,7 @@ def test_main_no_data_model_source(capsys, monkeypatch):
 def test_main_with_invalid_data_type(capsys, monkeypatch):
     """Test that the main function returns error when DATA_TYPES are invalid."""
 
-    monkeypatch.setenv("DATA_MODEL_SOURCE", str(Path(__file__).parent / 'data.model.csv'))
+    monkeypatch.setenv("DATA_MODEL_SOURCE", str(DATA_MODEL_PATH))
     monkeypatch.setenv("DATA_TYPES", "InvalidType")
 
     res = main()
@@ -37,34 +44,47 @@ def test_main_with_invalid_data_type(capsys, monkeypatch):
 def test_main_with_empty_data_type(capsys, monkeypatch):
     """Test that the main function works with empty DATA_TYPES."""
 
-    monkeypatch.setenv("DATA_MODEL_SOURCE", str(Path(__file__).parent / 'data.model.csv'))
+    monkeypatch.setenv("DATA_MODEL_SOURCE", str(DATA_MODEL_PATH))
     monkeypatch.setenv("DATA_TYPES", " ")
 
     res = main()
     captured = capsys.readouterr()
 
     assert res == 0, "Main function should return 0 when DATA_TYPES is empty"
-    assert "::notice::Successfully generated 9 schema(s)" in captured.out
+    assert "::notice::Successfully generated 3 schema(s)" in captured.out
 
 
 def test_main_with_no_data_types(capsys, monkeypatch):
     """Test that the main function works with no DATA_TYPES."""
 
-    monkeypatch.setenv("DATA_MODEL_SOURCE", str(Path(__file__).parent / 'data.model.csv'))
+    monkeypatch.setenv("DATA_MODEL_SOURCE", str(DATA_MODEL_PATH))
     monkeypatch.delenv('DATA_TYPES', raising=False)
 
     res = main()
     captured = capsys.readouterr()
 
     assert res == 0, "Main function should return 0 when DATA_MODEL_SOURCE is valid"
-    assert "::notice::Successfully generated 9 schema(s)" in captured.out
+    assert "::notice::Successfully generated 3 schema(s)" in captured.out
 
 
-def test_main_with_data_types(capsys, monkeypatch):
+def test_main_with_1_data_type(capsys, monkeypatch):
     """Test that the main function works with valid DATA_TYPES."""
 
-    monkeypatch.setenv("DATA_MODEL_SOURCE", str(Path(__file__).parent / 'data.model.csv'))
-    monkeypatch.setenv("DATA_TYPES", "Patient,JSONSchemaComponent")
+    monkeypatch.setenv("DATA_MODEL_SOURCE", str(DATA_MODEL_PATH))
+    monkeypatch.setenv("DATA_TYPES", "Datatype1")
+
+    res = main()
+    captured = capsys.readouterr()
+
+    assert res == 0, "Main function should return 0 when DATA_MODEL_SOURCE is valid"
+    assert "::notice::Successfully generated 1 schema(s)" in captured.out
+
+
+def test_main_with_2_data_types(capsys, monkeypatch):
+    """Test that the main function works with valid DATA_TYPES."""
+
+    monkeypatch.setenv("DATA_MODEL_SOURCE", str(DATA_MODEL_PATH))
+    monkeypatch.setenv("DATA_TYPES", "Datatype1,Datatype2")
 
     res = main()
     captured = capsys.readouterr()
@@ -88,7 +108,7 @@ def test_main_file_not_found(capsys, monkeypatch):
 def test_main_invalid_labels(capsys, monkeypatch):
     """Test that main warns and defaults when DATA_MODEL_LABELS is invalid."""
 
-    monkeypatch.setenv("DATA_MODEL_SOURCE", str(Path(__file__).parent / 'data.model.csv'))
+    monkeypatch.setenv("DATA_MODEL_SOURCE", str(DATA_MODEL_PATH))
     monkeypatch.setenv("DATA_MODEL_LABELS", "invalid_label")
     monkeypatch.delenv("DATA_TYPES", raising=False)
 
@@ -104,7 +124,7 @@ def test_main_github_output(tmp_path, monkeypatch):
 
     output_file = tmp_path / "github_output.txt"
     monkeypatch.setenv("GITHUB_OUTPUT", str(output_file))
-    monkeypatch.setenv("DATA_MODEL_SOURCE", str(Path(__file__).parent / 'data.model.csv'))
+    monkeypatch.setenv("DATA_MODEL_SOURCE", str(DATA_MODEL_PATH))
     monkeypatch.delenv("DATA_TYPES", raising=False)
 
     res = main()

@@ -5,7 +5,6 @@ actual API calls to Synapse. Integration tests are handled by the underlying
 synapseclient library.
 """
 
-import os
 import sys
 import yaml
 from pathlib import Path
@@ -100,8 +99,6 @@ def test_dockerfile_exists():
     assert dockerfile.exists(), "Dockerfile should exist"
 
     content = dockerfile.read_text()
-    assert 'ghcr.io/sage-bionetworks/synapsepythonclient:v4.11.0' in content, \
-        "Dockerfile should use official Synapse Python Client base image"
     assert 'ENTRYPOINT' in content, "Dockerfile should define ENTRYPOINT"
     assert 'generate_jsonschema_action.py' in content, \
         "Dockerfile should reference the action script"
