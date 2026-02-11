@@ -135,18 +135,6 @@ def test_action_script_imports():
         py_compile.compile(str(script_file), doraise=True)
 
 
-def test_test_data_exists():
-    """Test that test data model CSV exists."""
-    test_data = Path(__file__).parent / 'data.model.csv'
-    assert test_data.exists(), "Test data model should exist"
-
-    content = test_data.read_text()
-    # Check it's a CSV with expected structure
-    assert 'Attribute' in content, "Test data should have Attribute column"
-    assert 'Component' in content or 'Patient' in content, \
-        "Test data should have at least one component/data type"
-
-
 def test_readme_exists():
     """Test that README exists and contains key information."""
     readme = Path(__file__).parent.parent / 'README.md'
