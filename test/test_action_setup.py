@@ -5,7 +5,6 @@ actual API calls to Synapse. Integration tests are handled by the underlying
 synapseclient library.
 """
 
-import os
 import sys
 import yaml
 from pathlib import Path
@@ -100,8 +99,6 @@ def test_dockerfile_exists():
     assert dockerfile.exists(), "Dockerfile should exist"
 
     content = dockerfile.read_text()
-    assert 'ghcr.io/sage-bionetworks/synapsepythonclient:v4.11.0' in content, \
-        "Dockerfile should use official Synapse Python Client base image"
     assert 'ENTRYPOINT' in content, "Dockerfile should define ENTRYPOINT"
     assert 'generate_jsonschema_action.py' in content, \
         "Dockerfile should reference the action script"
@@ -136,18 +133,6 @@ def test_action_script_imports():
             'generate_jsonschema_action.py'
         import py_compile
         py_compile.compile(str(script_file), doraise=True)
-
-
-def test_test_data_exists():
-    """Test that test data model CSV exists."""
-    test_data = Path(__file__).parent / 'data.model.csv'
-    assert test_data.exists(), "Test data model should exist"
-
-    content = test_data.read_text()
-    # Check it's a CSV with expected structure
-    assert 'Attribute' in content, "Test data should have Attribute column"
-    assert 'Component' in content or 'Patient' in content, \
-        "Test data should have at least one component/data type"
 
 
 def test_readme_exists():

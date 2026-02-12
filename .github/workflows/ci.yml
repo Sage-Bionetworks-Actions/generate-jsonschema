@@ -12,8 +12,8 @@ permissions:
   contents: read
 
 jobs:
-  unit-tests:
-    name: Unit Tests
+  test:
+    name: Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -24,17 +24,18 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest
+          pip install git+https://github.com/Sage-Bionetworks/synapsePythonClient@fcf371f9bdeeaa8cf4ec0ea7c2446b7d20f35577
+          pip install pytest inflection networkx pandarallel pandas rdflib
 
-      - name: Run Unit Tests
+      - name: Run Tests
         run: |
-          python -m pytest test/test_action_setup.py -v
+          python -m pytest test -v
 
   docker-build:
     name: Docker Build Test
