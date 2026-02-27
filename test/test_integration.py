@@ -1,4 +1,5 @@
 import sys
+import os
 from pathlib import Path
 import pytest
 
@@ -134,3 +135,20 @@ def test_main_github_output(tmp_path, monkeypatch):
     content = output_file.read_text()
     assert "schemas=" in content
     assert "schemas-json<<EOF" in content
+
+
+def test_main_with_output_directory(tmp_path: str, monkeypatch):
+    """Tests main function using a custom output directory."""
+    output_dir = "output_dir"
+    monkeypatch.setenv("OUTPUT_DIRECTORY", output_dir)
+    monkeypatch.setenv("DATA_MODEL_SOURCE", str(DATA_MODEL_PATH))
+    monkeypatch.delenv("DATA_TYPES", raising=False)
+
+    res = main()
+
+    assert res == 0
+    output_path = Path(os.path.join(tmp_path, output_dir))
+    assert output_path.exists()
+    assert output_path.is_dir()
+    # Check if schemas were generated in the custom directory
+    assert len(list(output_path.glob("*.json"))) > 0

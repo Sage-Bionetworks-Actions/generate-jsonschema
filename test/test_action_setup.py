@@ -51,7 +51,7 @@ def test_optional_inputs_have_defaults():
     with open(action_file) as f:
         action_config = yaml.safe_load(f)
 
-    optional_inputs = ['data-types', 'data-model-labels']
+    optional_inputs = ['data-types', 'data-model-labels', 'output-directory']
     for input_name in optional_inputs:
         assert input_name in action_config['inputs'], \
             f"Optional input '{input_name}' should be defined"
@@ -91,6 +91,7 @@ def test_docker_configuration():
     assert 'DATA_MODEL_SOURCE' in env, "DATA_MODEL_SOURCE should be mapped"
     assert 'DATA_TYPES' in env, "DATA_TYPES should be mapped"
     assert 'DATA_MODEL_LABELS' in env, "DATA_MODEL_LABELS should be mapped"
+    assert 'OUTPUT_DIRECTORY' in env, "OUTPUT_DIRECTORY should be mapped"
 
 
 def test_dockerfile_exists():

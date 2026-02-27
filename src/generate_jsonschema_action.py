@@ -17,6 +17,7 @@ def main():
     - DATA_MODEL_SOURCE: URL or local path to the data model file (required)
     - DATA_TYPES: Comma-separated list of data types to include (optional, defaults to all)
     - DATA_MODEL_LABELS: 'class_label' or 'display_label' for schema
+    - OUTPUT_DIRECTORY: Directory to output generated schema files (optional, defaults to 'schemas')
     - GITHUB_OUTPUT: Path to GitHub Actions output file (automatically provided in GitHub Actions environment)
     """
     data_model_source = os.environ.get('DATA_MODEL_SOURCE')
@@ -53,8 +54,18 @@ def main():
 
     # Create output directory relative to current working directory
     # This ensures it's created in the GitHub workspace where artifacts can be uploaded
-    output_dir = os.path.join(os.getcwd(), 'schemas')
+    output_dir_name = os.environ.get('OUTPUT_DIRECTORY', 'schemas')
+    output_dir = os.path.join(os.getcwd(), output_dir_name)
     os.makedirs(output_dir, exist_ok=True)
+
+    print(f"\n{'='*60}")
+    print("JSON Schema Generation")
+    print(f"{'='*60}")
+    print(f"Data Model Source: {data_model_source}")
+    print(f"Data Types: {data_types}")
+    print(f"Data Model Labels: {data_model_labels}")
+    print(f"Output Directory: {output_dir}")
+    print(f"{'='*60}\n")
 
     try:
         syn = Synapse()
