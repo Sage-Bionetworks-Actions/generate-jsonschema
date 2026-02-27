@@ -8,8 +8,12 @@ from pathlib import Path
 from synapseclient import Synapse
 from synapseclient.extensions.curator import generate_jsonschema
 
+VALID_DATA_MODEL_LABELS = ['class_label', 'display_label']
+DEFAULT_DATA_MODEL_LABEL = 'class_label'
+DEFAULT_OUTPUT_DIRECTORY = 'schemas'
 
-def main():
+
+def main() -> int:
     """
     Main function to generate JSON schemas from data models.
 
@@ -36,25 +40,26 @@ def main():
             return 1
 
     # Parse data_types: empty string means all types (None)
-    data_types_str = os.environ.get('DATA_TYPES', None)
-    data_types = (
-        [dt.strip() for dt in data_types_str.split(',') if dt.strip()]
-        if data_types_str
-        else None
-    )
+    data_types_str = os.environ.get('DATA_TYPES')
+    if data_types_str:
+        # Split, strip, and filter out empty strings
+        data_types = [dt.strip() for dt in data_types_str.split(',') if dt.strip()]
+    else:
+        # If DATA_TYPES is not set or is an empty string, synapseclient generates for all types
+        data_types = None
 
     # Validate data_model_labels
-    data_model_labels = os.environ.get('DATA_MODEL_LABELS', 'class_label')
-    if data_model_labels not in ['class_label', 'display_label']:
+    data_model_labels = os.environ.get('DATA_MODEL_LABELS', DEFAULT_DATA_MODEL_LABEL)
+    if data_model_labels not in VALID_DATA_MODEL_LABELS:
         print(
             f"::warning::Invalid data_model_labels '{data_model_labels}', "
-            f"using 'class_label'"
+            f"using '{DEFAULT_DATA_MODEL_LABEL}'"
         )
-        data_model_labels = 'class_label'
+        data_model_labels = DEFAULT_DATA_MODEL_LABEL
 
     # Create output directory relative to current working directory
     # This ensures it's created in the GitHub workspace where artifacts can be uploaded
-    output_dir_name = os.environ.get('OUTPUT_DIRECTORY', 'schemas')
+    output_dir_name = os.environ.get('OUTPUT_DIRECTORY', DEFAULT_OUTPUT_DIRECTORY)
     output_dir = os.path.join(os.getcwd(), output_dir_name)
     os.makedirs(output_dir, exist_ok=True)
 
@@ -99,7 +104,10 @@ def main():
         return 0
 
     except Exception as e:
-        print(f"::error::Schema generation failed: {str(e)}", file=sys.stderr)
+        print(
+            f"::error::Schema generation failed ({type(e).__name__}): {str(e)}",
+            file=sys.stderr
+        )
         import traceback
         traceback.print_exc(file=sys.stderr)
         return 1

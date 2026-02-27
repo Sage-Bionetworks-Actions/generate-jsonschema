@@ -9,6 +9,7 @@ from generate_jsonschema_action import main
 
 DATA_MODEL_FILE = "data_model.csv"
 DATA_MODEL_PATH = Path(__file__).parent / DATA_MODEL_FILE
+TOTAL_SCHEMAS_IN_TEST_MODEL = 3
 
 
 @pytest.fixture(autouse=True)
@@ -39,59 +40,40 @@ def test_main_with_invalid_data_type(capsys, monkeypatch):
     captured = capsys.readouterr()
 
     assert res == 1, "Main function should return 1 when DATA_MODEL_SOURCE is valid but DATA_TYPES are invalid"
-    assert "::error::Schema generation failed: 'InvalidType' is not a valid datatype in the data model" in captured.err
+    print("#################")
+    print(captured.err)
+    assert "::error::Schema generation failed" in captured.err
+    assert "'InvalidType' is not a valid datatype in the data model." in captured.err
 
 
-def test_main_with_empty_data_type(capsys, monkeypatch):
-    """Test that the main function works with empty DATA_TYPES."""
-
+@pytest.mark.parametrize(
+    "data_types_env, expected_count",
+    [
+        (None, TOTAL_SCHEMAS_IN_TEST_MODEL),  # Corresponds to delenv
+        (" ", TOTAL_SCHEMAS_IN_TEST_MODEL),
+        ("Datatype1", 1),
+        ("Datatype1,Datatype2", 2),
+    ],
+    ids=[
+        "no_env_var",
+        "whitespace_string",
+        "one_type",
+        "two_types",
+    ]
+)
+def test_main_data_types(capsys, monkeypatch, data_types_env, expected_count):
+    """Test schema generation with various DATA_TYPES inputs."""
     monkeypatch.setenv("DATA_MODEL_SOURCE", str(DATA_MODEL_PATH))
-    monkeypatch.setenv("DATA_TYPES", " ")
+    if data_types_env is None:
+        monkeypatch.delenv("DATA_TYPES", raising=False)
+    else:
+        monkeypatch.setenv("DATA_TYPES", data_types_env)
 
     res = main()
     captured = capsys.readouterr()
 
-    assert res == 0, "Main function should return 0 when DATA_TYPES is empty"
-    assert "::notice::Successfully generated 3 schema(s)" in captured.out
-
-
-def test_main_with_no_data_types(capsys, monkeypatch):
-    """Test that the main function works with no DATA_TYPES."""
-
-    monkeypatch.setenv("DATA_MODEL_SOURCE", str(DATA_MODEL_PATH))
-    monkeypatch.delenv('DATA_TYPES', raising=False)
-
-    res = main()
-    captured = capsys.readouterr()
-
-    assert res == 0, "Main function should return 0 when DATA_MODEL_SOURCE is valid"
-    assert "::notice::Successfully generated 3 schema(s)" in captured.out
-
-
-def test_main_with_1_data_type(capsys, monkeypatch):
-    """Test that the main function works with valid DATA_TYPES."""
-
-    monkeypatch.setenv("DATA_MODEL_SOURCE", str(DATA_MODEL_PATH))
-    monkeypatch.setenv("DATA_TYPES", "Datatype1")
-
-    res = main()
-    captured = capsys.readouterr()
-
-    assert res == 0, "Main function should return 0 when DATA_MODEL_SOURCE is valid"
-    assert "::notice::Successfully generated 1 schema(s)" in captured.out
-
-
-def test_main_with_2_data_types(capsys, monkeypatch):
-    """Test that the main function works with valid DATA_TYPES."""
-
-    monkeypatch.setenv("DATA_MODEL_SOURCE", str(DATA_MODEL_PATH))
-    monkeypatch.setenv("DATA_TYPES", "Datatype1,Datatype2")
-
-    res = main()
-    captured = capsys.readouterr()
-
-    assert res == 0, "Main function should return 0 when DATA_MODEL_SOURCE is valid"
-    assert "::notice::Successfully generated 2 schema(s)" in captured.out
+    assert res == 0
+    assert f"::notice::Successfully generated {expected_count} schema(s)" in captured.out
 
 
 def test_main_file_not_found(capsys, monkeypatch):
@@ -137,7 +119,7 @@ def test_main_github_output(tmp_path, monkeypatch):
     assert "schemas-json<<EOF" in content
 
 
-def test_main_with_output_directory(tmp_path: str, monkeypatch):
+def test_main_with_output_directory(tmp_path: Path, monkeypatch):
     """Tests main function using a custom output directory."""
     output_dir = "output_dir"
     monkeypatch.setenv("OUTPUT_DIRECTORY", output_dir)
@@ -147,8 +129,8 @@ def test_main_with_output_directory(tmp_path: str, monkeypatch):
     res = main()
 
     assert res == 0
-    output_path = Path(os.path.join(tmp_path, output_dir))
+    output_path = tmp_path / output_dir
     assert output_path.exists()
     assert output_path.is_dir()
     # Check if schemas were generated in the custom directory
-    assert len(list(output_path.glob("*.json"))) > 0
+    assert len(list(output_path.glob("*.json"))) == TOTAL_SCHEMAS_IN_TEST_MODEL
