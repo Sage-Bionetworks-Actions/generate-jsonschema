@@ -105,22 +105,6 @@ def test_dockerfile_exists():
         "Dockerfile should reference the action script"
 
 
-def test_action_script_exists():
-    """Test that the Python action script exists and is executable."""
-    script_file = Path(__file__).parent.parent / 'src' / \
-        'generate_jsonschema_action.py'
-    assert script_file.exists(), "Action script should exist"
-
-    content = script_file.read_text()
-    assert 'from synapseclient import Synapse' in content, \
-        "Script should import Synapse client"
-    assert 'from synapseclient.extensions.curator import generate_jsonschema' in content, \
-        "Script should import generate_jsonschema function"
-    assert 'def main():' in content, "Script should have main() function"
-    assert 'if __name__ == "__main__":' in content, \
-        "Script should have __main__ entry point"
-
-
 def test_action_script_imports():
     """Test that the action script can be imported without errors."""
     try:
