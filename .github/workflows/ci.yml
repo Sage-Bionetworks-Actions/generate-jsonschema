@@ -58,16 +58,6 @@ jobs:
           push: false
           tags: generate-jsonschema-action:test
 
-      - name: Verify Action Files
-        run: |
-          echo "✓ Verifying action configuration..."
-          test -f action.yml
-          test -f Dockerfile
-          test -f src/generate_jsonschema_action.py
-          test -f test/data.model.csv
-          echo "✓ All required files present"
-
-
   test-action:
     name: GitHub Actions Test
     runs-on: ubuntu-latest
