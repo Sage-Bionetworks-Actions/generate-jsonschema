@@ -71,7 +71,7 @@ jobs:
         id: register
         uses: ./
         with:
-          data-model-source: ./tests/data_model.csv
+          data-model-source: ./test/data_model.csv
           data-model-labels: "display_label"
           data-types: "Datatype1,Datatype2"
           output-directory: "test-schemas"
