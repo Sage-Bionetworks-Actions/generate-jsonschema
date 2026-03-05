@@ -21,6 +21,10 @@ inputs:
     description: 'Label type to use: class_label or display_label'
     required: false
     default: 'class_label'
+  output-directory:
+    description: 'Directory to output generated schema files'
+    required: false
+    default: 'schemas'
 
 outputs:
   schemas:
@@ -37,3 +41,4 @@ runs:
     DATA_MODEL_SOURCE: ${{ inputs.data-model-source }}
     DATA_TYPES: ${{ inputs.data-types }}
     DATA_MODEL_LABELS: ${{ inputs.data-model-labels }}
+    OUTPUT_DIRECTORY: ${{ inputs.output-directory }}
