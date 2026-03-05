@@ -22,4 +22,27 @@ Thumbs.db
 # IDE files
 .idea
 *.code-workspace
+.vscode/
+
+# Python
 *.pyc
+*.pyo
+__pycache__/
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Generated schemas (local testing)
+schemas/
