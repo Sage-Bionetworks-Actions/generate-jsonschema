@@ -147,6 +147,7 @@ The `schemas-json` output contains the full array of schema dictionaries, allowi
 | `data-model-source` | Path or URL to CSV or JSONLD data model file | Yes | - |
 | `data-types` | Comma-separated list of data types to generate schemas for (leave empty for all) | No | `''` |
 | `data-model-labels` | Label type to use: `class_label` or `display_label` | No | `class_label` |
+| `output-directory` | Directory to output generated schema files | No | `schemas` |
 
 ### About `data-model-labels`
 
