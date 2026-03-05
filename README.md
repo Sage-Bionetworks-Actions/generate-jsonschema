@@ -193,14 +193,27 @@ on:
 
 ## Local Development and Testing
 
+### Running Unit Tests
+
+Install dependencies and run tests:
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+pip install "synapseclient[pandas,curator] @ git+https://github.com/Sage-Bionetworks/synapsePythonClient@fcf371f9bdeeaa8cf4ec0ea7c2446b7d20f35577"
+pip install pytest
+
+# Run tests
+pytest test -v
+```
+
 ### Building the Docker Container
 
 ```bash
 docker build -t generate-jsonschema-action .
 ```
 
-
-### Testing Locally
+### Testing with Docker
 
 #### On Unix/macOS (bash):
 
