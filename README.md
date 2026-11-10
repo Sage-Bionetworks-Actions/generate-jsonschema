@@ -1,11 +1,13 @@
 # Generate JSON Schema Action
 
-![Continuous Integration](https://github.com/sage-bionetworks/generate-jsonschema/actions/workflows/ci.yml/badge.svg)
-![Linter](https://github.com/sage-bionetworks/generate-jsonschema/actions/workflows/linter.yml/badge.svg)
+![Continuous Integration](https://github.com/Sage-Bionetworks-Actions/generate-jsonschema/actions/workflows/ci.yml/badge.svg)
+![Linter](https://github.com/Sage-Bionetworks-Actions/generate-jsonschema/actions/workflows/linter.yml/badge.svg)
 
-A GitHub Action to generate JSON Schema files from data models (CSV/JSONLD) using the Synapse Python Client curator extension.
+A GitHub Action to generate JSON Schema files from data models (CSV/JSONLD)
+using the Synapse Python Client curator extension.
 
-This action is part of the DPE-1554 implementation for automated JSON Schema management in Synapse workflows.
+This action is part of the DPE-1554 implementation for automated JSON Schema
+management in Synapse workflows.
 
 ## Features
 
@@ -31,7 +33,7 @@ on:
     branches:
       - 'main'
     paths:
-      - 'models/**'  # Only trigger when model files change
+      - 'models/**' # Only trigger when model files change
 
 jobs:
   generate-schemas:
@@ -41,7 +43,7 @@ jobs:
 
       - name: Generate JSON Schemas
         id: generate
-        uses: sage-bionetworks/generate-jsonschema@v1
+        uses: Sage-Bionetworks-Actions/generate-jsonschema@v1
         with:
           data-model-source: ./models/data.model.csv
           # data-types omitted = generate all types
@@ -58,7 +60,7 @@ jobs:
 ```yaml
 - name: Generate Schemas for Specific Types
   id: generate
-  uses: sage-bionetworks/generate-jsonschema@v1
+  uses: Sage-Bionetworks-Actions/generate-jsonschema@v1
   with:
     data-model-source: ./models/biospecimen.model.csv
     data-types: 'Patient,Biospecimen,Analysis'
@@ -67,7 +69,9 @@ jobs:
 
 ### With PR Comment Integration
 
-This action can be combined with [mshick/add-pr-comment](https://github.com/mshick/add-pr-comment) to automatically post schema summaries to Pull Requests:
+This action can be combined with
+[mshick/add-pr-comment](https://github.com/mshick/add-pr-comment) to
+automatically post schema summaries to Pull Requests:
 
 ```yaml
 name: Generate and Comment Schemas
@@ -92,7 +96,7 @@ jobs:
 
       - name: Generate JSON Schemas
         id: generate
-        uses: sage-bionetworks/generate-jsonschema@v1
+        uses: Sage-Bionetworks-Actions/generate-jsonschema@v1
         with:
           data-model-source: ./models/data.model.csv
 
@@ -138,32 +142,37 @@ jobs:
           message-id: schema-generation
 ```
 
-The `schemas-json` output contains the full array of schema dictionaries, allowing you to create custom formatters and reports. The `message-id` parameter ensures the comment is "sticky" and will update on subsequent runs rather than creating multiple comments.
+The `schemas-json` output contains the full array of schema dictionaries,
+allowing you to create custom formatters and reports. The `message-id` parameter
+ensures the comment is "sticky" and will update on subsequent runs rather than
+creating multiple comments.
 
 ## Inputs
 
-| Input | Description | Required | Default |
-|-------|-------------|----------|---------|
-| `data-model-source` | Path or URL to CSV or JSONLD data model file | Yes | - |
-| `data-types` | Comma-separated list of data types to generate schemas for (leave empty for all) | No | `''` |
-| `data-model-labels` | Label type to use: `class_label` or `display_label` | No | `class_label` |
-| `output-directory` | Directory to output generated schema files | No | `schemas` |
+| Input               | Description                                                                      | Required | Default       |
+| ------------------- | -------------------------------------------------------------------------------- | -------- | ------------- |
+| `data-model-source` | Path or URL to CSV or JSONLD data model file                                     | Yes      | -             |
+| `data-types`        | Comma-separated list of data types to generate schemas for (leave empty for all) | No       | `''`          |
+| `data-model-labels` | Label type to use: `class_label` or `display_label`                              | No       | `class_label` |
+| `output-directory`  | Directory to output generated schema files                                       | No       | `schemas`     |
 
 ### About `data-model-labels`
 
 - `class_label` (default): Uses standard attribute names as property keys
-- `display_label`: Uses display names if valid (no blacklisted characters like parentheses, periods, spaces, or hyphens)
+- `display_label`: Uses display names if valid (no blacklisted characters like
+  parentheses, periods, spaces, or hyphens)
 
 ## Outputs
 
-| Output | Description |
-|--------|-------------|
-| `schemas` | Path to directory containing generated schema files (e.g., `/workspace/schemas`) |
+| Output         | Description                                                                                                                  |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `schemas`      | Path to directory containing generated schema files (e.g., `/workspace/schemas`)                                             |
 | `schemas-json` | JSON string containing array of generated schema dictionaries for use with PR comment actions or other downstream processing |
 
 ## Workflow Trigger Configuration (Recommended)
 
-We recommend using specific workflow triggers to run this action only when relevant files change. This improves efficiency and reduces unnecessary CI runs.
+We recommend using specific workflow triggers to run this action only when
+relevant files change. This improves efficiency and reduces unnecessary CI runs.
 
 ### Recommended Trigger Configuration
 
@@ -171,13 +180,13 @@ We recommend using specific workflow triggers to run this action only when relev
 on:
   pull_request:
     types:
-      - opened           # When PR is first opened
-      - synchronize      # When new commits are pushed
-      - labeled          # When labels are added (optional - useful for manual triggers)
+      - opened # When PR is first opened
+      - synchronize # When new commits are pushed
+      - labeled # When labels are added (optional - useful for manual triggers)
     branches:
-      - 'main'           # Only for PRs targeting main branch
+      - 'main' # Only for PRs targeting main branch
     paths:
-      - 'path/to/data/model/directories/**'      # Your data model directories
+      - 'path/to/data/model/directories/**' # Your data model directories
 ```
 
 ### Why These Triggers?
@@ -187,10 +196,11 @@ on:
   - `synchronize`: Re-validates on new commits
   - `labeled`: Allows manual triggering by adding labels
 
-- **`branches`**: Ensures the workflow only runs for PRs targeting your main branch
+- **`branches`**: Ensures the workflow only runs for PRs targeting your main
+  branch
 
-- **`paths`**: Prevents unnecessary runs when unrelated files change (e.g., documentation, tests)
-
+- **`paths`**: Prevents unnecessary runs when unrelated files change (e.g.,
+  documentation, tests)
 
 ## Local Development and Testing
 
@@ -200,9 +210,10 @@ Install dependencies and run tests:
 
 ```bash
 # Install dependencies
+# Use the synapseclient version from the Dockerfile base image tag
+SYN_VERSION=$(sed -n 's/^FROM .*synapsepythonclient:v\([^ @]*\).*/\1/p' Dockerfile | head -n1)
+pip install "synapseclient[pandas,curator]==${SYN_VERSION}"
 pip install -r requirements.txt
-pip install "synapseclient[pandas,curator] @ git+https://github.com/Sage-Bionetworks/synapsePythonClient@fcf371f9bdeeaa8cf4ec0ea7c2446b7d20f35577"
-pip install pytest
 
 # Run tests
 pytest test -v
@@ -216,22 +227,24 @@ docker build -t generate-jsonschema-action .
 
 ### Testing with Docker
 
-#### On Unix/macOS (bash):
+#### On Unix/macOS (Bash)
 
 ```bash
 docker run --rm \
-  -e DATA_MODEL_SOURCE="/test/data.model.csv" \
+  -e DATA_MODEL_SOURCE="/test/data_model.csv" \
   -v $(pwd)/test:/test \
   generate-jsonschema-action
 ```
 
-#### On Windows (PowerShell):
+#### On Windows (PowerShell)
 
-Use backticks (`) for line continuation, and use `${PWD}` for the current directory. Use absolute Windows paths with forward slashes or double backslashes.
+Use backticks (`` ` ``) for line continuation, and use `${PWD}` for the current
+directory. Use absolute Windows paths with forward slashes or double
+backslashes.
 
 ```powershell
 docker run --rm `
-  -e DATA_MODEL_SOURCE="/test/data.model.csv" `
+  -e DATA_MODEL_SOURCE="/test/data_model.csv" `
   -v "${PWD}/test:/test" `
   generate-jsonschema-action
 ```
@@ -239,21 +252,51 @@ docker run --rm `
 Or as a single line:
 
 ```powershell
-docker run --rm -e DATA_MODEL_SOURCE="/test/data.model.csv" -v "${PWD}/test:/test" generate-jsonschema-action
+docker run --rm -e DATA_MODEL_SOURCE="/test/data_model.csv" -v "${PWD}/test:/test" generate-jsonschema-action
 ```
 
+### Linting
+
+CI runs [super-linter](https://github.com/super-linter/super-linter) on all
+files (`.github/workflows/linter.yml`). To run the same checks locally, use the
+super-linter image version that the workflow uses:
+
+```bash
+docker run --rm \
+  -e RUN_LOCAL=true \
+  -e DEFAULT_BRANCH=main \
+  -e LINTER_RULES_PATH=. \
+  -e CHECKOV_FILE_NAME=.checkov.yml \
+  -e VALIDATE_ALL_CODEBASE=true \
+  -e VALIDATE_BIOME_FORMAT=false \
+  -e VALIDATE_BIOME_LINT=false \
+  -e VALIDATE_GITHUB_ACTIONS_ZIZMOR=false \
+  -v "$(pwd)":/tmp/lint \
+  ghcr.io/super-linter/super-linter:slim-v9.0.0
+```
+
+The linter configs are in the repository root (for example `.markdown-lint.yml`,
+`.prettierrc.yml`, `.ruff.toml`). Linters without a config file there use the
+super-linter defaults.
 
 ## Technical Details
 
-- **Base Image**: `ghcr.io/sage-bionetworks/synapsepythonclient:v4.11.0`
-- **Python Version**: 3.10+
-- **Dependencies**: synapseclient v4.11.0 with curator extension (pre-installed in base image)
+- **Base Image**: `ghcr.io/sage-bionetworks/synapsepythonclient`. The `FROM` tag
+  in the `Dockerfile` sets the version.
+- **Python Version**: The Python version in the base image
+- **Dependencies**: synapseclient with curator extension (pre-installed in base
+  image). The base image tag sets the synapseclient version.
 
 ## Related Actions
 
 This action is designed to work with:
-- [sage-bionetworks/register-jsonschema](https://github.com/sage-bionetworks/register-jsonschema) - Register generated schemas to Synapse organizations (coming soon)
-- [mshick/add-pr-comment](https://github.com/mshick/add-pr-comment) - Post schema summaries to Pull Requests
+
+- [sage-bionetworks/register-jsonschema][register-jsonschema] - Register
+  generated schemas to Synapse organizations (coming soon)
+- [mshick/add-pr-comment](https://github.com/mshick/add-pr-comment) - Post
+  schema summaries to Pull Requests
+
+[register-jsonschema]: https://github.com/sage-bionetworks/register-jsonschema
 
 ## Documentation
 
@@ -272,6 +315,7 @@ See [LICENSE](LICENSE) file for details.
 ## Support
 
 For issues and questions:
+
 - Open an issue in this repository
 - Check the [Synapse documentation](https://python-docs.synapse.org/)
 - Visit the [Sage Bionetworks community forums](https://www.synapse.org/)

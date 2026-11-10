@@ -1,10 +1,5 @@
-# Using develop branch for IsTemplate column of CSV
-FROM ghcr.io/sage-bionetworks/synapsepythonclient:develop-fcf371f9bdeeaa8cf4ec0ea7c2446b7d20f35577
-
-# Copy requirements and install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir synapseclient[pandas,curator]
+# The base image tag sets the synapseclient version.
+FROM ghcr.io/sage-bionetworks/synapsepythonclient:v4.15.0
 
 # Copy Python script
 COPY src/generate_jsonschema_action.py /usr/local/bin/generate_jsonschema_action.py
