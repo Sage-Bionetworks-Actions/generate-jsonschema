@@ -113,8 +113,8 @@ def main():
         return 0
 
     # main() must catch all errors and return an exit code
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        print(f"::error::Schema generation failed: {str(e)}", file=sys.stderr)
+    except Exception as e:  # noqa: BLE001 # pylint: disable=broad-exception-caught
+        print(f"::error::Schema generation failed: {e}", file=sys.stderr)
         traceback.print_exc(file=sys.stderr)
         return 1
 

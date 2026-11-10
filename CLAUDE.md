@@ -57,9 +57,9 @@ the local action (`uses: ./`) on `test/data_model.csv`.
 
 - `main()` returns an exit code (0/1) and catches all exceptions. Do not raise
   or call `sys.exit` inside it. The `except Exception` has a
-  `# pylint: disable=broad-exception-caught` comment. If you remove it, pylint
-  fails. `write_github_output()` writes the outputs. Keep `main()` at 15 local
-  variables or fewer (pylint `too-many-locals`).
+  `# noqa: BLE001 # pylint: disable=broad-exception-caught` comment. If you
+  remove it, ruff and pylint fail. `write_github_output()` writes the outputs.
+  Keep `main()` at 15 local variables or fewer (pylint `too-many-locals`).
 - Use GitHub workflow commands for messages: `::error::` to **stderr**,
   `::warning::` and `::notice::` to **stdout**. The tests check the stream
   (`captured.err` vs `captured.out`) and the exact text, for example:
@@ -131,6 +131,10 @@ the local action (`uses: ./`) on `test/data_model.csv`.
   wraps Markdown prose at 80 characters.
 - textlint (`terminology` rule) rejects words such as `README`, `repo` and
   `hard-code` in plain text. It does not check code spans, so write `README.md`.
+- flake8 reports E402 for the import after `sys.path.insert` in the tests, but
+  ruff does not. `.ruff.toml` sets `external = ["E402"]`, so ruff RUF100 does
+  not report the `# noqa: E402` as unused. Do not remove the setting or the
+  `noqa`.
 
 ## Testing
 

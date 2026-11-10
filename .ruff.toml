@@ -7,4 +7,7 @@ cache-dir = "/tmp/.ruff_cache"
 line-length = 88
 
 [lint]
+# flake8 uses "noqa: E402" in the tests. Ruff does not report E402 there, so
+# tell ruff that this code is external. Then RUF100 does not report the noqa.
+external = ["E402"]
 ignore = ["E203"]

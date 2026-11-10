@@ -272,7 +272,7 @@ docker run --rm \
   -e VALIDATE_BIOME_LINT=false \
   -e VALIDATE_GITHUB_ACTIONS_ZIZMOR=false \
   -v "$(pwd)":/tmp/lint \
-  ghcr.io/super-linter/super-linter:slim-v8.7.0
+  ghcr.io/super-linter/super-linter:slim-v9.0.0
 ```
 
 The linter configs are in the repository root (for example `.markdown-lint.yml`,
