@@ -1,10 +1,15 @@
+"""Integration tests that run main() against the installed synapseclient."""
+
 import sys
 from pathlib import Path
+
 import pytest
 
 # Add src to path for importing the action script
-sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
-from generate_jsonschema_action import main
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+from generate_jsonschema_action import (  # noqa: E402 # pylint: disable=wrong-import-position
+    main,
+)
 
 DATA_MODEL_FILE = "data_model.csv"
 DATA_MODEL_PATH = Path(__file__).parent / DATA_MODEL_FILE
@@ -20,7 +25,7 @@ def run_in_temp_dir(tmp_path, monkeypatch):
 def test_main_no_data_model_source(capsys, monkeypatch):
     """Test that the main function needs DATA_MODEL_SOURCE and returns error when it's missing."""
 
-    monkeypatch.delenv('DATA_MODEL_SOURCE', raising=False)
+    monkeypatch.delenv("DATA_MODEL_SOURCE", raising=False)
 
     res = main()
     captured = capsys.readouterr()
@@ -38,8 +43,11 @@ def test_main_with_invalid_data_type(capsys, monkeypatch):
     res = main()
     captured = capsys.readouterr()
 
-    assert res == 1, "Main function should return 1 when DATA_MODEL_SOURCE is valid but DATA_TYPES are invalid"
-    assert "::error::Schema generation failed: 'InvalidType' is not a valid datatype in the data model" in captured.err
+    assert res == 1, "Main function should return 1 when DATA_TYPES are invalid"
+    assert (
+        "::error::Schema generation failed: 'InvalidType' is not a valid datatype in the data model"
+        in captured.err
+    )
 
 
 def test_main_with_empty_data_type(capsys, monkeypatch):
@@ -59,7 +67,7 @@ def test_main_with_no_data_types(capsys, monkeypatch):
     """Test that the main function works with no DATA_TYPES."""
 
     monkeypatch.setenv("DATA_MODEL_SOURCE", str(DATA_MODEL_PATH))
-    monkeypatch.delenv('DATA_TYPES', raising=False)
+    monkeypatch.delenv("DATA_TYPES", raising=False)
 
     res = main()
     captured = capsys.readouterr()
