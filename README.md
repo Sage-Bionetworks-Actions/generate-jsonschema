@@ -1,7 +1,7 @@
 # Generate JSON Schema Action
 
-![Continuous Integration](https://github.com/sage-bionetworks/generate-jsonschema/actions/workflows/ci.yml/badge.svg)
-![Linter](https://github.com/sage-bionetworks/generate-jsonschema/actions/workflows/linter.yml/badge.svg)
+![Continuous Integration](https://github.com/Sage-Bionetworks-Actions/generate-jsonschema/actions/workflows/ci.yml/badge.svg)
+![Linter](https://github.com/Sage-Bionetworks-Actions/generate-jsonschema/actions/workflows/linter.yml/badge.svg)
 
 A GitHub Action to generate JSON Schema files from data models (CSV/JSONLD) using the Synapse Python Client curator extension.
 
@@ -41,7 +41,7 @@ jobs:
 
       - name: Generate JSON Schemas
         id: generate
-        uses: sage-bionetworks/generate-jsonschema@v1
+        uses: Sage-Bionetworks-Actions/generate-jsonschema@v1
         with:
           data-model-source: ./models/data.model.csv
           # data-types omitted = generate all types
@@ -58,7 +58,7 @@ jobs:
 ```yaml
 - name: Generate Schemas for Specific Types
   id: generate
-  uses: sage-bionetworks/generate-jsonschema@v1
+  uses: Sage-Bionetworks-Actions/generate-jsonschema@v1
   with:
     data-model-source: ./models/biospecimen.model.csv
     data-types: 'Patient,Biospecimen,Analysis'
@@ -92,7 +92,7 @@ jobs:
 
       - name: Generate JSON Schemas
         id: generate
-        uses: sage-bionetworks/generate-jsonschema@v1
+        uses: Sage-Bionetworks-Actions/generate-jsonschema@v1
         with:
           data-model-source: ./models/data.model.csv
 
@@ -200,9 +200,10 @@ Install dependencies and run tests:
 
 ```bash
 # Install dependencies
+# Use the synapseclient version from the Dockerfile base image tag
+SYN_VERSION=$(sed -n 's/^FROM .*synapsepythonclient:v\([^ @]*\).*/\1/p' Dockerfile | head -n1)
+pip install "synapseclient[pandas,curator]==${SYN_VERSION}"
 pip install -r requirements.txt
-pip install "synapseclient[pandas,curator] @ git+https://github.com/Sage-Bionetworks/synapsePythonClient@fcf371f9bdeeaa8cf4ec0ea7c2446b7d20f35577"
-pip install pytest
 
 # Run tests
 pytest test -v
@@ -220,7 +221,7 @@ docker build -t generate-jsonschema-action .
 
 ```bash
 docker run --rm \
-  -e DATA_MODEL_SOURCE="/test/data.model.csv" \
+  -e DATA_MODEL_SOURCE="/test/data_model.csv" \
   -v $(pwd)/test:/test \
   generate-jsonschema-action
 ```
@@ -231,7 +232,7 @@ Use backticks (`) for line continuation, and use `${PWD}` for the current direct
 
 ```powershell
 docker run --rm `
-  -e DATA_MODEL_SOURCE="/test/data.model.csv" `
+  -e DATA_MODEL_SOURCE="/test/data_model.csv" `
   -v "${PWD}/test:/test" `
   generate-jsonschema-action
 ```
@@ -239,15 +240,15 @@ docker run --rm `
 Or as a single line:
 
 ```powershell
-docker run --rm -e DATA_MODEL_SOURCE="/test/data.model.csv" -v "${PWD}/test:/test" generate-jsonschema-action
+docker run --rm -e DATA_MODEL_SOURCE="/test/data_model.csv" -v "${PWD}/test:/test" generate-jsonschema-action
 ```
 
 
 ## Technical Details
 
-- **Base Image**: `ghcr.io/sage-bionetworks/synapsepythonclient:v4.11.0`
-- **Python Version**: 3.10+
-- **Dependencies**: synapseclient v4.11.0 with curator extension (pre-installed in base image)
+- **Base Image**: `ghcr.io/sage-bionetworks/synapsepythonclient`. The `FROM` tag in the `Dockerfile` sets the version.
+- **Python Version**: The Python version in the base image
+- **Dependencies**: synapseclient with curator extension (pre-installed in base image). The base image tag sets the synapseclient version.
 
 ## Related Actions
 

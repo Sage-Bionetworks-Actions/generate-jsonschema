@@ -15,23 +15,49 @@ jobs:
   test:
     name: Tests
     runs-on: ubuntu-latest
+    env:
+      # Must match the Python version in the Dockerfile base image.
+      # The "Check Python version" step fails if they differ.
+      PYTHON_VERSION: "3.15"
 
     steps:
       - name: Checkout
         id: checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
+      - name: Check Python version matches base image
+        run: |
+          BASE_IMAGE=$(sed -n 's/^FROM \([^ ]*synapsepythonclient:[^ ]*\).*/\1/p' Dockerfile | head -n1)
+          IMAGE_PY=$(docker run --rm --entrypoint python "$BASE_IMAGE" \
+            -c 'import sys; print("%d.%d" % sys.version_info[:2])')
+          echo "Base image Python: $IMAGE_PY, CI Python: $PYTHON_VERSION"
+          if [ "$IMAGE_PY" != "$PYTHON_VERSION" ]; then
+            echo "::error::CI PYTHON_VERSION ($PYTHON_VERSION) does not" \
+              "match the base image Python ($IMAGE_PY). Update" \
+              "PYTHON_VERSION in ci.yml."
+            exit 1
+          fi
+
       - name: Setup Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
-          python-version: "3.11"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install dependencies
         run: |
+          # Use the synapseclient version from the Dockerfile base image tag
+          # Read the full tag, so that suffixes such as -rc1 cause a failure
+          SYN_VERSION=$(sed -n 's/^FROM .*synapsepythonclient:v\([^ @]*\).*/\1/p' Dockerfile | head -n1)
+          if ! printf '%s' "$SYN_VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Could not read a release synapseclient version" \
+              "from Dockerfile (got '$SYN_VERSION'). Expected a line" \
+              "like 'FROM ...synapsepythonclient:vX.Y.Z'"
+            exit 1
+          fi
+          echo "synapseclient version: $SYN_VERSION"
           python -m pip install --upgrade pip
+          pip install "synapseclient[pandas,curator]==${SYN_VERSION}"
           pip install -r requirements.txt
-          pip install git+https://github.com/Sage-Bionetworks/synapsePythonClient@fcf371f9bdeeaa8cf4ec0ea7c2446b7d20f35577
-          pip install pytest inflection networkx pandarallel pandas rdflib
 
       - name: Run Tests
         run: |
