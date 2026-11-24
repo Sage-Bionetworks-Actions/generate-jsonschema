@@ -1,5 +1,11 @@
 # Generate JSON Schema Action
 
+> [!WARNING]
+>
+> **This action is deprecated.** Use the action in
+> [Sage-Bionetworks/synapse-actions](https://github.com/Sage-Bionetworks/synapse-actions)
+> instead. This action will not get new features or fixes.
+
 ![Continuous Integration](https://github.com/Sage-Bionetworks-Actions/generate-jsonschema/actions/workflows/ci.yml/badge.svg)
 ![Linter](https://github.com/Sage-Bionetworks-Actions/generate-jsonschema/actions/workflows/linter.yml/badge.svg)
 
